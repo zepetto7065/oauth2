@@ -16,12 +16,15 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
-@Service
 @Slf4j
+@Service
 public class KakaoServiceImpl implements KakaoService {
 
     @Value("${custom.oauth2.kakao.client-id}")
     private String CLIENT_ID;
+
+    @Value("${custom.oauth2.kakao.redirect-url}")
+    private String REDIRECT_URL;
 
     public String getAccessToken(String code) {
         String accessToken = "";
@@ -37,8 +40,8 @@ public class KakaoServiceImpl implements KakaoService {
             BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(conn.getOutputStream()));
             StringBuilder sb = new StringBuilder();
             sb.append("grant_type=authorization_code");
-            sb.append("&client_id="+CLIENT_ID);
-            sb.append("&redirect_uri=http://localhost:8080/login");
+            sb.append("&client_id=" + CLIENT_ID);
+            sb.append("&redirect_uri=" + REDIRECT_URL);
             sb.append("&code=" + code);
             bw.write(sb.toString());
             bw.flush();
@@ -85,15 +88,15 @@ public class KakaoServiceImpl implements KakaoService {
             conn.setRequestProperty("Authorization", "Bearer " + access_token);
 
             int responseCode = conn.getResponseCode();
-            log.info("responseCode : {}",responseCode);
+            log.info("responseCode : {}", responseCode);
 
-            BufferedReader br= new BufferedReader(new InputStreamReader(conn.getInputStream()));
+            BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream()));
             String line = "";
             String result = "";
-            while((line = br.readLine()) != null){
+            while ((line = br.readLine()) != null) {
                 result += line;
             }
-            log.info("response body : {}",result);
+            log.info("response body : {}", result);
 
             JsonParser parser = new JsonParser();
             JsonElement element = parser.parse(result);
@@ -107,10 +110,11 @@ public class KakaoServiceImpl implements KakaoService {
 //            userInfo.put("email", email);
 
         } catch (Exception e) {
-            log.error("e -> {}",e.getMessage());
+            log.error("e -> {}", e.getMessage());
             throw new RuntimeException();
         }
 
         return userInfo;
     }
 }
+
